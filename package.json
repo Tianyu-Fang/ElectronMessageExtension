@@ -1,0 +1,22 @@
+{
+  "name": "electronmessageextension",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^34.1.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^6.1.0"
+  },
+  "dependencies": {
+    "framer-motion": "^12.4.0",
+    "recoil": "^0.7.7",
+    "tailwindcss": "^4.0.4"
+  }
+}
