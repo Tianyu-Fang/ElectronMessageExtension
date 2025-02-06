@@ -15,6 +15,7 @@ npm install bootstrap react-bootstrap
 ```
 
 ```
+source venv/bin/activate
 
 ```
 
