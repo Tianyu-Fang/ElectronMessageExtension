@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "electron": "^34.1.0",
     "electron-builder": "^25.1.8",
     "vite": "^6.1.0"

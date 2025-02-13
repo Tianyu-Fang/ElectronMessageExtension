@@ -1,52 +1,59 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+// main.js
+
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 
 let mainWindow;
-let floatingIcon;
+let flaskServer;
 
-app.whenReady().then(() => {
+function createWindow () {
     mainWindow = new BrowserWindow({
         width: 1000,
-        height: 700,
+        height: 800,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
         }
     });
 
+    // Load React app
     mainWindow.loadURL('http://localhost:5173'); // React dev server
 
-    // Floating icon window (will appear on text selection)
-    floatingIcon = new BrowserWindow({
-        width: 40,
-        height: 40,
-        frame: false,
-        alwaysOnTop: true,
-        transparent: true,
-        resizable: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
+    mainWindow.on('closed', function () {
+        mainWindow = null;
+        if (flaskServer) {
+            flaskServer.kill();
         }
     });
+}
 
-    floatingIcon.loadURL('http://localhost:5173/icon'); // React floating icon page
-    floatingIcon.hide();
+function startFlaskServer() {
+    const flaskPath = path.join(__dirname, 'backend', 'server.py');
+    flaskServer = spawn('python', [flaskPath]);
 
-    ipcMain.on('show-icon', (event, { x, y }) => {
-        floatingIcon.setBounds({ x, y, width: 40, height: 40 });
-        floatingIcon.show();
+    flaskServer.stdout.on('data', (data) => {
+        console.log(`Flask: ${data}`);
     });
 
-    ipcMain.on('hide-icon', () => {
-        floatingIcon.hide();
+    flaskServer.stderr.on('data', (data) => {
+        console.error(`Flask Error: ${data}`);
     });
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    flaskServer.on('close', (code) => {
+        console.log(`Flask server exited with code ${code}`);
     });
+}
+
+app.on('ready', () => {
+    startFlaskServer();
+    createWindow();
 });
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', function () {
+    if (mainWindow === null) createWindow();
 });
