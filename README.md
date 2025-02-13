@@ -21,5 +21,5 @@ pip install flask openai pyperclip
 ```
 
 ```
-pip install python-dotenv
+pip install python-dotenv flask-cors
 ```
