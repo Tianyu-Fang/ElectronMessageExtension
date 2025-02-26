@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { Button, Form, Container, Row, Col, Alert } from 'react-bootstrap';
 import { saveAs } from 'file-saver';
@@ -24,11 +24,19 @@ const GenerateMessages = () => {
                 recipientType,
                 numResponses
             });
-            setResponses(res.data.responses);
+    
+            // Ensure responses are properly structured
+            const formattedResponses = res.data.responses.map((resp, index) => ({
+                subject: contentType === "Email" ? `Variation ${index + 1}` : "",
+                body: resp  // Store response directly as the body
+            }));
+    
+            setResponses(formattedResponses);
         } catch (err) {
             setError(err.response?.data?.error || 'Error generating messages.');
         }
     };
+    
 
     const handleCopy = (body) => {
         navigator.clipboard.writeText(body)
@@ -105,28 +113,30 @@ const GenerateMessages = () => {
             </Form>
 
             {responses.length > 0 && (
-                <>
-                    <hr />
-                    <h3 className="my-4">📄 {recipientType} Messages</h3>
-                    {responses.map((resp, index) => (
-                        <div key={index} className="mb-4">
-                            <h5>Variation {index + 1}</h5>
-                            {contentType === "Email" && resp.subject && (
-                                <p><strong>Subject:</strong> {resp.subject}</p>
-                            )}
-                            <pre style={{ backgroundColor: '#f8f9fa', padding: '10px' }}>
-                                {resp.body}
-                            </pre>
-                            <Button variant="secondary" onClick={() => handleCopy(resp.body)}>
-                                📋 Copy Response
-                            </Button>
-                        </div>
-                    ))}
-                    <Button variant="success" onClick={handleDownload}>
-                        💾 Download All Versions
-                    </Button>
-                </>
-            )}
+    <>
+        <hr />
+        <h3 className="my-4">📄 {recipientType} Messages</h3>
+        {responses.map((resp, index) => (
+            <div key={index} className="mb-4">
+                <h5>Variation {index + 1}</h5>
+                {contentType === "Email" && resp.subject && (
+                    <p><strong>Subject:</strong> {resp.subject}</p>
+                )}
+                {/* ✅ Fix formatting by using <pre> with white-space styling */}
+                <pre style={{ backgroundColor: '#f8f9fa', padding: '10px', whiteSpace: 'pre-wrap' }}>
+                    {resp.body}
+                </pre>
+                <Button variant="secondary" onClick={() => handleCopy(resp.body)}>
+                    📋 Copy Response
+                </Button>
+            </div>
+        ))}
+        <Button variant="success" onClick={handleDownload}>
+            💾 Download All Versions
+        </Button>
+    </>
+)}
+
         </Container>
     );
 };

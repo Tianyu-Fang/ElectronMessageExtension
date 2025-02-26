@@ -1,42 +1,118 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* === General Styles === */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* === Navbar Styles === */
+.navbar {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand::before {
+  content: "📩 ";
+  font-size: 1.5rem;
+}
+
+/* === Form Styling === */
+.form-label {
+  font-weight: bold;
+  color: #333;
+}
+
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* === Button Styling === */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* === Response Box === */
+.response-box {
+  background: #ffffff;
+  padding: 15px;
+  border-left: 5px solid #007bff;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* === Copy & Download Buttons === */
+.copy-button {
+  display: block;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.copy-button:hover {
+  background-color: #218838;
+}
+
+.download-button {
+  display: block;
+  margin-top: 15px;
+  padding: 8px 12px;
+  background-color: #ff9900;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.download-button:hover {
+  background-color: #e68a00;
+}
+
+/* === Mobile Responsiveness === */
+@media (max-width: 768px) {
+  .container {
+      width: 95%;
   }
-  to {
-    transform: rotate(360deg);
+
+  .navbar-nav {
+      text-align: center;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .navbar-nav .nav-link {
+      display: block;
+      padding: 10px;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

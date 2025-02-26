@@ -8,7 +8,7 @@ from flask_cors import CORS
 load_dotenv()
 
 # Initialize OpenAI client
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -84,46 +84,18 @@ Original message: "{user_input}"
 """
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": "Generate exact variations matching my message."}
             ],
             temperature=0.3,  # Lower temperature for more focused responses
-            max_tokens=500,
-            n=num_responses
+            max_tokens=500
         )
 
-        # Process responses
-        clean_responses = []
-        raw_response = response.choices[0].message['content']
+        clean_responses = response.choices[0].message.content.split("\n\n")
 
-        # Split variations using the delimiter
-        variations = [v.strip() for v in raw_response.split("---") if v.strip()]
-
-        for variation in variations[:num_responses]:
-            lines = [line.strip() for line in variation.split("\n") if line.strip()]
-            
-            subject = ""
-            body = []
-            found_subject = False
-            
-            for line in lines:
-                if line.startswith("Subject:"):
-                    subject = line.replace("Subject:", "").strip()
-                    found_subject = True
-                elif found_subject or content_type == "Text":
-                    body.append(line)
-            
-            clean_body = "\n".join(body)
-            
-            # Fix placeholders for classmate texts
-            if recipient_type == "Classmate" and content_type == "Text":
-                clean_body = clean_body.replace("[Full Name]", "[Name]").replace("Full Name", "Name")
-            
-            clean_responses.append({"subject": subject, "body": clean_body})
-        
         return jsonify({"responses": clean_responses})
 
     except Exception as e:
@@ -166,7 +138,7 @@ Negative: [negative response draft]
 """
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": analysis_prompt},
@@ -175,7 +147,7 @@ Negative: [negative response draft]
             temperature=0.2,
             max_tokens=300
         )
-        raw_analysis = response.choices[0].message['content']
+        raw_analysis = response.choices[0].message.content
         analysis = parse_analysis(raw_analysis)
         return jsonify({"analysis": analysis})
     except Exception as e:
@@ -205,24 +177,16 @@ def parse_analysis(raw_text):
         elif line.startswith("##RESPONSES##"):
             current_section = "responses"
         elif current_section == "emotion" and line:
-            # Extract emotion
-            parts = line.split(":")
-            if len(parts) > 1:
-                sections["emotion"] = parts[1].strip().lower()
+            sections["emotion"] = line.split(":")[-1].strip().lower()
         elif current_section == "cues" and line.startswith("-"):
-            cue = line[1:].strip()
-            if cue:
-                sections["cues"].append(cue)
+            sections["cues"].append(line[1:].strip())
         elif current_section == "summary" and line:
             sections["summary"] = line
         elif current_section == "keywords" and line:
-            sections["keywords"] = [kw.strip() for kw in line.split(",") if kw.strip()]
+            sections["keywords"] = [kw.strip() for kw in line.split(",")]
         elif current_section == "responses" and ":" in line:
             tone, text = line.split(":", 1)
-            tone = tone.strip().lower()
-            text = text.strip()
-            if tone in ["positive", "neutral", "negative"]:
-                sections["responses"][tone] = text
+            sections["responses"][tone.strip().lower()] = text.strip()
     
     return sections
 
